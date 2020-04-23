@@ -10,8 +10,9 @@ from .models import (
     Result
 )
 
-from django.views import View
-from django.http  import HttpResponse, JsonResponse
+from django.views        import View
+from django.http         import HttpResponse, JsonResponse
+from django.forms.models import model_to_dict
 
 class QuestionView(View):
     def get(self, request, question_id):
@@ -25,20 +26,18 @@ class QuestionView(View):
             Choice.
             objects.
             filter(question_id = questions.id).
-            values('choice')
+            values()
         )
 
         question_data = {
-            {
-                'question' : {
-                    'id' : questions.id,
-                    'question' : questions.question,
-                    'image_url' : questions.image_url,
-                }
-            },
-            {
-                'choice' : [choice for choice in choices]
-            }
+            'id'        : questions.id,
+            'question'  : questions.question,
+            'image_url' : questions.image_url,
+            'choice'    : [
+                {
+                    'id'     : choice["id"],
+                    'choice' : choice["choice"]
+                } for choice in choices ]
         }
 
         return JsonResponse({"question_data" : question_data}, status = 200)
