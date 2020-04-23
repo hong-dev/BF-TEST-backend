@@ -1,15 +1,44 @@
 import json
 
-from .models import Question, Response, Result
+from .models import (
+    Question,
+    Choice,
+    Case,
+    Stack,
+    User,
+    Response,
+    Result
+)
 
 from django.views import View
 from django.http  import HttpResponse, JsonResponse
 
 class QuestionView(View):
     def get(self, request, question_id):
-        questions = Question.objects.filter(id = question_id).values()
+        questions = (
+            Question.
+            objects.
+            get(id = question_id)
+        )
 
-        return JsonResponse({"question" : quetions[0]}, status = 200)
+        choices = (
+            Choice.
+            objects.
+            filter(question_id = questions.id).
+            values('choice')
+        )
+
+        question_data =
+            {
+                'question' : {
+                    'id' : questions.id,
+                    'question' : questions.question,
+                    'image_url' : questions.image_url,
+                },
+                'choice' : [choice for choice in choices]
+            }
+
+        return JsonResponse({"question_data" : question_data}, status = 200)
 
 #class ResultView(View):
 #    def post(self, request):
