@@ -28,15 +28,18 @@ class QuestionView(View):
             values('choice')
         )
 
-        question_data =
+        question_data = {
             {
                 'question' : {
                     'id' : questions.id,
                     'question' : questions.question,
                     'image_url' : questions.image_url,
-                },
+                }
+            },
+            {
                 'choice' : [choice for choice in choices]
             }
+        }
 
         return JsonResponse({"question_data" : question_data}, status = 200)
 
