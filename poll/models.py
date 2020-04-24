@@ -12,6 +12,7 @@ class Question(models.Model):
 class Choice(models.Model):
     choice     = models.CharField(max_length = 500, null = True)
     question   = models.ForeignKey(Question, on_delete = models.SET_NULL, null = True)
+    stack      = models.ForeignKey('Stack', on_delete = models.SET_NULL, null = True)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now = True)
 
