@@ -70,10 +70,9 @@ class ResultView(View):
                 if Choice.objects.select_related('stack').get(id = choice_id).stack.id == 1:
                     count_front += 1
 
-                if Choice.objects.select_related('stack').get(id = choice_id).stack.id:
+                if Choice.objects.select_related('stack').get(id = choice_id).stack.id != 4:
                     count_valid_question += 1
-            print(count_front)
-            print(count_valid_question)
+
             if count_front == count_valid_question/2:
                 result  = Result.objects.get(stack = 3)
                 dev_fit = Result.objects.get(stack = 3)
