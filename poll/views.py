@@ -49,7 +49,7 @@ class ResultView(View):
             p_type     = json.loads(request.body)["type"]
             user_name  = json.loads(request.body)["user"]
             browser    = request.META['HTTP_USER_AGENT']
-            ip_address = request.META.get('HTTP_X_FORWARDED_FOR')
+            ip_address = request.META['REMOTE_ADDR']
 
             user = User(
                 name       = user_name,
