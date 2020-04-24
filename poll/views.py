@@ -56,35 +56,35 @@ class ResultView(View):
                 browser    = browser,
                 ip_address = ip_address
             )
+            user.save()
 
             count_front = 0
             count_valid_question = 0
             for question_id, choice_id in score.items():
                 Response(
-                    user     = user,
-                    question = question_id,
-                    choice   = answer_id
+                    user_id     = user.id,
+                    question_id = int(question_id),
+                    choice_id   = choice_id
                 ).save()
 
-                if Choice.objects.select_related('stack').get(id = choice_id).stack == 1:
+                if Choice.objects.select_related('stack').get(id = choice_id).stack.id == 1:
                     count_front += 1
 
-                if Choice.objects.select_related('stack').get(id = choice_id).stack != null:
+                if Choice.objects.select_related('stack').get(id = choice_id).stack.id:
                     count_valid_question += 1
-
+            print(count_front)
+            print(count_valid_question)
             if count_front == count_valid_question/2:
                 result  = Result.objects.get(stack = 3)
                 dev_fit = Result.objects.get(stack = 3)
-
             elif count_front > count_valid_question/2:
-                result  = Result.objects.get(case = p_type, stack = 1)
-                dev_fit = Result.objects.get(case = p_type, stack = 2)
-
+                result  = Result.objects.get(case__name = p_type, stack = 1)
+                dev_fit = Result.objects.get(case__name = p_type, stack = 2)
             else:
-                result  = Result.objects.get(case = p_type, stack = 2)
-                dev_fit = Result.objects.get(case = p_type, stack = 1)
+                result  = Result.objects.get(case__name = p_type, stack = 2)
+                dev_fit = Result.objects.get(case__name = p_type, stack = 1)
 
-            user.result_id = result
+            user.result_id = result.id
             user.save()
 
             user_result = {
