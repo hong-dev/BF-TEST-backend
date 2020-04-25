@@ -47,12 +47,10 @@ class ResultView(View):
         try:
             score      = json.loads(request.body)["answer"]
             p_type     = json.loads(request.body)["type"]
-            user_name  = json.loads(request.body)["user"]
             browser    = request.META['HTTP_USER_AGENT']
             ip_address = request.META['REMOTE_ADDR']
 
             user = User(
-                name       = user_name,
                 browser    = browser,
                 ip_address = ip_address
             )
