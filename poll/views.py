@@ -14,6 +14,10 @@ from django.views        import View
 from django.http         import HttpResponse, JsonResponse
 from django.forms.models import model_to_dict
 
+class PingView(View):
+    def get(self, request):
+        return HttpResponse("pong")
+
 class QuestionView(View):
     def get(self, request, question_id):
         questions = (
