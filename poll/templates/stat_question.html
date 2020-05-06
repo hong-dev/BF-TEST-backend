@@ -1,0 +1,29 @@
+{% load static %}
+<html>
+  <head>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body>
+    <header class="nav">
+      <h4>문제별 통계</h4>
+    </header>
+    <section class="content">
+      <table class="tbu">
+        <tr>
+          <th>Question</th>
+          <th>Choice</th>
+          <th>Count</th>
+          <th>(%)</th>
+        </tr>
+        {% for row in query %}
+        <tr>
+          <td>{{ row.0 }}</td>
+          <td>{{ row.1 }}</td>
+          <td>{{ row.2 }}</td>
+          <td>{{ row.3 }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+{% load static %}
+<html>
+  <head>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body>
+    <header class="nav">
+      <h4>응답 유저별 통계</h4>
+    </header>
+    <section class="content">
+      <table class="tbu">
+        <tr>
+          <th>User_id</th>
+          <th>Front</th>
+          <th>Back</th>
+          <th>F/Total(%)</th>
+          <th>Result</th>
+          <th>Created_at</th>
+          <th>Ip_address</th>
+          <th>Browser</th>
+        </tr>
+        {% for row in query %}
+        <tr>
+          <td>{{ row.0 }}</td>
+          <td>{{ row.1 }}</td>
+          <td>{{ row.2 }}</td>
+          <td>{{ row.3 }}</td>
+          <td>{{ row.4 }}</td>
+          <td>{{ row.5 }}</td>
+          <td>{{ row.6 }}</td>
+          <td>{{ row.7 }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </section>
+  </body>
+</html>

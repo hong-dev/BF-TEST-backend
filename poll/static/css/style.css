@@ -1,0 +1,32 @@
+* {
+  box-sizing: border-box;
+}
+
+nav {
+  margin: 20px;
+}
+
+h4 {
+  font-family: sans-serif;
+  color: rgb(37, 37, 37);
+  margin-top: 20px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 11;
+  font-family: sans-serif;
+  color: rgb(37, 37, 37);
+}
+
+th,
+td {
+  text-align: left;
+  padding: 3px;
+  color: rgb(37, 37, 37);
+}
+
+tr:nth-child(even) {
+  background-color: #ebebeb;
+}

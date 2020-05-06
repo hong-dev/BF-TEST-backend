@@ -1,0 +1,27 @@
+{% load static %}
+<html>
+  <head>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body>
+    <header class="nav">
+      <h4>결과별 통계</h4>
+    </header>
+    <section class="content">
+      <table class="tbu">
+        <tr>
+          <th>Result_id</th>
+          <th>Name</th>
+          <th>Count</th>
+        </tr>
+        {% for row in query %}
+        <tr>
+          <td>{{ row.0 }}</td>
+          <td>{{ row.1 }}</td>
+          <td>{{ row.2 }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </section>
+  </body>
+</html>
