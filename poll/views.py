@@ -1,4 +1,5 @@
 import json
+import datetime
 
 from .models import (
     Question,
@@ -7,12 +8,14 @@ from .models import (
     Stack,
     User,
     Response,
-    Result
+    Result,
 )
 
-from django.views        import View
-from django.http         import HttpResponse, JsonResponse
-from django.forms.models import model_to_dict
+from django.views     import View
+from django.shortcuts import render
+from django.http      import HttpResponse, JsonResponse
+from django.db        import connection
+
 
 class PingView(View):
     def get(self, request):
@@ -118,3 +121,70 @@ class ResultView(View):
             return JsonResponse({"error" : "INVALID_KEYS"}, status = 400)
         except json.decoder.JSONDecodeError:
             return JsonResponse({"error" : "INVALID_KEYS"}, status = 400)
+
+class StatUserView(View):
+    def get(self, request):
+        today = datetime.datetime.today()
+        start_at = request.GET.get('start', today.strftime('%Y%m%d00'))
+        end_at   = request.GET.get('end', (today + datetime.timedelta(days=1)).strftime('%Y%m%d00'))
+        query    = """select
+                    r.user_id,
+                    count(case when s.name = 'Front' then s.name end) as Front,
+                    count(case when s.name = 'Back' then s.name end) as Back,
+                    concat(round(count(case when s.name = 'Front' then s.name end) * 100 / 8), '%') as 'F/Total(%)',
+                    re.name as Result, u.created_at,
+                    u.ip_address,
+                    u.browser
+                    from responses as r
+                    left join users as u on u.id = r.user_id
+                    left join results as re on re.id = u.result_id
+                    left join choices as c on r.choice_id = c.id
+                    left join stacks as s on s.id = c.stack_id
+                    where r.user_id > 0"""\
+                    + ' AND r.created_at >= ' +"'"+ str(datetime.datetime.strptime(start_at, '%Y%m%d%H'))+"'"\
+                    + ' AND r.created_at <= ' +"'"+ str(datetime.datetime.strptime(end_at, '%Y%m%d%H'))+"'"\
+                    + ' group by r.user_id'
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            query = cursor.fetchall()
+        return render(request, 'stat_user.html', {'query': query})
+
+class StatResultView(View):
+    def get(self, request):
+        today = datetime.datetime.today()
+        start_at = request.GET.get('start', today.strftime('%Y%m%d00'))
+        end_at   = request.GET.get('end', (today + datetime.timedelta(days=1)).strftime('%Y%m%d00'))
+        query    = """select r.id, r.name, count(r.id) as count
+                    from users as u
+                    left join results as r on r.id = u.result_id
+                    where u.id > 0"""\
+                    + ' AND r.created_at >= ' +"'"+ str(datetime.datetime.strptime(start_at, '%Y%m%d%H'))+"'"\
+                    + ' AND r.created_at <= ' +"'"+ str(datetime.datetime.strptime(end_at, '%Y%m%d%H'))+"'"\
+                    + ' group by r.id with ROLLUP;'
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            query = cursor.fetchall()
+        return render(request, 'stat_result.html', {'query': query})
+
+class StatQuestionView(View):
+    def get(self, request):
+        today = datetime.datetime.today()
+        start_at = request.GET.get('start', today.strftime('%Y%m%d00'))
+        end_at   = request.GET.get('end', (today + datetime.timedelta(days=1)).strftime('%Y%m%d00'))
+        query    = """SELECT q.question, c.choice, count(r.id) as count, CONCAT(TRUNCATE(100*count(r.id)/cr.crt,1), '%') as '(%)'
+                    from responses as r
+                    left join questions as q on r.question_id = q.id
+                    left join choices as c on c.id = r.choice_id
+                    left join users as u on u.id = r.user_id
+                    left join (select question_id, count(question_id) as crt
+                    from responses
+                    where user_id > 0
+                    group by question_id) as cr on cr.question_id = r.question_id
+                    where r.user_id > 0"""\
+                    + ' AND r.created_at >= ' +"'"+ str(datetime.datetime.strptime(start_at, '%Y%m%d%H'))+"'"\
+                    + ' AND r.created_at <= ' +"'"+ str(datetime.datetime.strptime(end_at, '%Y%m%d%H'))+"'"\
+                    + ' group by q.question, c.choice with ROLLUP;'
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            query = cursor.fetchall()
+        return render(request, 'stat_question.html', {'query': query})
